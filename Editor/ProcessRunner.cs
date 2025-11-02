@@ -135,8 +135,6 @@ namespace Microsoft.Unity.VisualStudio.Editor
 				cursorStoragePath = Path.Combine(userProfile, "AppData", "Roaming", "cursor", "User", "workspaceStorage");
 #endif
 				
-				Debug.Log($"[Cursor] Looking for workspaces in: {cursorStoragePath}");
-				
 				if (Directory.Exists(cursorStoragePath))
 				{
 					foreach (var workspaceDir in Directory.GetDirectories(cursorStoragePath))
