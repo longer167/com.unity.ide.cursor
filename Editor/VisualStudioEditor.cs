@@ -134,10 +134,10 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 			if (installation is VisualStudioCursorInstallation)
 			{
-				var reuseWindow = EditorPrefs.GetBool("cursor_reuse_existing_window", false);
+				var reuseWindow = EditorPrefs.GetBool(VisualStudioCursorInstallation.ReuseExistingWindowKey, false);
 				var newReuseWindow = EditorGUILayout.Toggle(new GUIContent("Reuse existing Cursor window", "When enabled, opens files in an existing Cursor window if found. When disabled, always opens a new window."), reuseWindow);
 				if (newReuseWindow != reuseWindow)
-					EditorPrefs.SetBool("cursor_reuse_existing_window", newReuseWindow);
+					EditorPrefs.SetBool(VisualStudioCursorInstallation.ReuseExistingWindowKey, newReuseWindow);
 				
 				EditorGUILayout.Space();
 			}

@@ -20,7 +20,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 	internal class VisualStudioCursorInstallation : VisualStudioInstallation
 	{
 		private static readonly IGenerator _generator = new SdkStyleProjectGeneration();
-		private const string ReuseExistingWindowKey = "cursor_reuse_existing_window";
+		internal const string ReuseExistingWindowKey = "cursor_reuse_existing_window";
 
 		public override bool SupportsAnalyzers
 		{
