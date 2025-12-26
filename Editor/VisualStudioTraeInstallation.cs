@@ -1,4 +1,4 @@
-﻿/*---------------------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -17,10 +17,10 @@ using Debug = UnityEngine.Debug;
 
 namespace Microsoft.Unity.VisualStudio.Editor
 {
-	internal class VisualStudioCursorInstallation : VisualStudioInstallation
+	internal class VisualStudioTraeInstallation : VisualStudioInstallation
 	{
 		private static readonly IGenerator _generator = new SdkStyleProjectGeneration();
-		internal const string ReuseExistingWindowKey = "cursor_reuse_existing_window";
+		internal const string ReuseExistingWindowKey = "trae_reuse_existing_window";
 
 		public override bool SupportsAnalyzers
 		{
@@ -40,7 +40,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 		private string GetExtensionPath()
 		{
-			var vscode = IsPrerelease ? ".vscode-insiders" : ".vscode";
+			var vscode = IsPrerelease ? ".trae-insiders" : ".trae";
 			var extensionsPath = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), vscode, "extensions");
 			if (!Directory.Exists(extensionsPath))
 				return null;
@@ -71,11 +71,11 @@ namespace Microsoft.Unity.VisualStudio.Editor
 		private static bool IsCandidateForDiscovery(string path)
 		{
 #if UNITY_EDITOR_OSX
-			return Directory.Exists(path) && Regex.IsMatch(path, ".*Cursor.*.app$", RegexOptions.IgnoreCase);
+			return Directory.Exists(path) && Regex.IsMatch(path, ".*Trae.*.app$", RegexOptions.IgnoreCase);
 #elif UNITY_EDITOR_WIN
-			return File.Exists(path) && Regex.IsMatch(path, ".*Cursor.*.exe$", RegexOptions.IgnoreCase);
+			return File.Exists(path) && Regex.IsMatch(path, ".*Trae.*.exe$", RegexOptions.IgnoreCase);
 #else
-			return File.Exists(path) && path.EndsWith("cursor", StringComparison.OrdinalIgnoreCase);
+			return File.Exists(path) && path.EndsWith("trae", StringComparison.OrdinalIgnoreCase);
 #endif
 		}
 
@@ -133,10 +133,10 @@ namespace Microsoft.Unity.VisualStudio.Editor
 			}
 
 			isPrerelease = isPrerelease || editorPath.ToLower().Contains("insider");
-			installation = new VisualStudioCursorInstallation()
+			installation = new VisualStudioTraeInstallation()
 			{
 				IsPrerelease = isPrerelease,
-				Name = "Cursor" + (isPrerelease ? " - Insider" : string.Empty) + (version != null ? $" [{version.ToString(3)}]" : string.Empty),
+				Name = "Trae" + (isPrerelease ? " - Insider" : string.Empty) + (version != null ? $" [{version.ToString(3)}]" : string.Empty),
 				Path = editorPath,
 				Version = version ?? new Version()
 			};
@@ -153,16 +153,16 @@ namespace Microsoft.Unity.VisualStudio.Editor
 			var programFiles = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
 
 			foreach (var basePath in new[] { localAppPath, programFiles }) {
-				candidates.Add(IOPath.Combine(basePath, "cursor", "cursor.exe"));
+				candidates.Add(IOPath.Combine(basePath, "Trae", "Trae.exe"));
 			}
 #elif UNITY_EDITOR_OSX
 			var appPath = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
-			candidates.AddRange(Directory.EnumerateDirectories(appPath, "Cursor*.app"));
+			candidates.AddRange(Directory.EnumerateDirectories(appPath, "Trae*.app"));
 #elif UNITY_EDITOR_LINUX
 			// Well known locations
-			candidates.Add("/usr/bin/cursor");
-			candidates.Add("/bin/cursor");
-			candidates.Add("/usr/local/bin/cursor");
+			candidates.Add("/usr/bin/trae");
+			candidates.Add("/bin/trae");
+			candidates.Add("/usr/local/bin/trae");
 
 			// Preference ordered base directories relative to which desktop files should be searched
 			candidates.AddRange(GetXdgCandidates());
@@ -191,7 +191,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 				try
 				{
-					var desktopFile = IOPath.Combine(dir, "applications/code.desktop");
+					var desktopFile = IOPath.Combine(dir, "applications/trae.desktop");
 					if (!File.Exists(desktopFile))
 						continue;
 
@@ -500,7 +500,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 			}
 		}
 
-		private Process FindRunningCursorWithSolution(string solutionPath)
+		private Process FindRunningTraeWithSolution(string solutionPath)
 		{
 			var normalizedTargetPath = solutionPath.Replace('\\', '/').TrimEnd('/').ToLowerInvariant();
 
@@ -518,13 +518,13 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 			// Get process name list based on different operating systems
 #if UNITY_EDITOR_OSX
-			processes.AddRange(Process.GetProcessesByName("Cursor"));
-			processes.AddRange(Process.GetProcessesByName("Cursor Helper"));
+			processes.AddRange(Process.GetProcessesByName("Trae"));
+			processes.AddRange(Process.GetProcessesByName("Trae Helper"));
 #elif UNITY_EDITOR_LINUX
-			processes.AddRange(Process.GetProcessesByName("cursor"));
-			processes.AddRange(Process.GetProcessesByName("Cursor"));
+			processes.AddRange(Process.GetProcessesByName("trae"));
+			processes.AddRange(Process.GetProcessesByName("Trae"));
 #else
-			processes.AddRange(Process.GetProcessesByName("cursor"));
+			processes.AddRange(Process.GetProcessesByName("Trae"));
 #endif
 
 			foreach (var process in processes)
@@ -559,7 +559,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 				}
 				catch (Exception ex)
 				{
-					Debug.LogError($"[Cursor] Error checking process: {ex}");
+					Debug.LogError($"[Trae] Error checking process: {ex}");
 					continue;
 				}
 			}
@@ -589,7 +589,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 			if (EditorPrefs.GetBool(ReuseExistingWindowKey, false))
 			{
-				var existingProcess = FindRunningCursorWithSolution(directory);
+				var existingProcess = FindRunningTraeWithSolution(directory);
 				if (existingProcess != null)
 				{
 					try
@@ -603,7 +603,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 					}
 					catch (Exception ex)
 					{
-						Debug.LogError($"[Cursor] Error using existing instance: {ex}");
+						Debug.LogError($"[Trae] Error using existing instance: {ex}");
 					}
 				}
 			}
